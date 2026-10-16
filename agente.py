@@ -2,6 +2,10 @@
 
 Ainda sem ferramentas: ele não consulta pedido nem abre chamado de verdade. Isso chega no capítulo 3.
 """
+from typing import TypedDict
+
+from langchain_core.language_models import BaseChatModel
+from langgraph.graph import END, START, StateGraph
 from pydantic import BaseModel, Field
 
 from contrato import Decisao
@@ -20,3 +24,12 @@ class Escolha(BaseModel):
 
     decisao: Decisao
     motivo: str = Field(description="por que esta decisão, em uma frase")
+
+
+class Conversa(TypedDict, total=False):
+    """O que o grafo carrega de um nó para o outro."""
+
+    pergunta: str
+    decisao: Decisao
+    motivo: str
+    resposta: str
