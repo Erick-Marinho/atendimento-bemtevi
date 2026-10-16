@@ -1,3 +1,4 @@
 {"id": "R01", "pergunta": "Onde está o meu pedido BT-1002? Meu e-mail é bruno.lima@exemplo.test", "decisao": "responder", "motivo": "pedido e e-mail batem; o status está nos dados", "precisa": ["pedidos"], "pedido": "BT-1002", "email": "bruno.lima@exemplo.test"}
 {"id": "R02", "pergunta": "Quando chega o BT-1003? E-mail carla.mendes@exemplo.test", "decisao": "responder", "motivo": "pedido enviado: a previsão de entrega está nos dados", "precisa": ["pedidos"], "pedido": "BT-1003", "email": "carla.mendes@exemplo.test"}
 {"id": "R03", "pergunta": "O pedido BT-1001 já foi entregue? Sou a Ana, ana.souza@exemplo.test", "decisao": "responder", "motivo": "pedido e e-mail batem; a data de entrega está nos dados", "precisa": ["pedidos"], "pedido": "BT-1001", "email": "ana.souza@exemplo.test"}
+{"id": "R04", "pergunta": "Cadê o meu pedido?", "decisao": "responder", "motivo": "tem pedido no meio", "precisa": ["pedidos"]}
