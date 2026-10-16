@@ -1,7 +1,10 @@
 """O contrato do agente: o que ele faz com cada pergunta, escrito antes de existir agente."""
 from enum import StrEnum
+from pathlib import Path
 
 from pydantic import BaseModel, Field
+
+AQUI = Path(__file__).parent
 
 
 class Decisao(StrEnum):
@@ -31,3 +34,16 @@ class Caso(BaseModel):
     precisa: list[Fonte] = []
     pedido: str | None = Field(default=None, pattern=r"^BT-\d{4}$")
     email: str | None = None
+
+
+def carregar_referencia(caminho: Path = AQUI / "referencia.jsonl") -> list[Caso]:
+    """As perguntas de referência, uma por linha; para na primeira linha inválida, dizendo qual."""
+    casos = []
+    for n, linha in enumerate(caminho.read_text(encoding="utf-8").splitlines(), start=1):
+        if not linha.strip():
+            continue
+        try:
+            casos.append(Caso.model_validate_json(linha))
+        except ValueError as erro:
+            raise ValueError(f"{caminho.name}, linha {n}: {erro}") from erro
+    return casos
