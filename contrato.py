@@ -2,7 +2,7 @@
 from enum import StrEnum
 from pathlib import Path
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 AQUI = Path(__file__).parent
 
@@ -34,6 +34,14 @@ class Caso(BaseModel):
     precisa: list[Fonte] = []
     pedido: str | None = Field(default=None, pattern=r"^BT-\d{4}$")
     email: str | None = None
+
+    @model_validator(mode="after")
+    def pedido_vem_com_email(self):
+        if (self.pedido is None) != (self.email is None):
+            raise ValueError("pedido e e-mail andam juntos: informe os dois ou nenhum")
+        if Fonte.PEDIDOS in self.precisa and self.pedido is None:
+            raise ValueError("um caso que precisa dos pedidos tem que dizer qual pedido")
+        return self
 
 
 def carregar_referencia(caminho: Path = AQUI / "referencia.jsonl") -> list[Caso]:
