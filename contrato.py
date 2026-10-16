@@ -1,10 +1,12 @@
 """O contrato do agente: o que ele faz com cada pergunta, escrito antes de existir agente."""
+import json
 from enum import StrEnum
 from pathlib import Path
 
 from pydantic import BaseModel, Field, model_validator
 
 AQUI = Path(__file__).parent
+DADOS = AQUI / "dados"
 
 
 class Decisao(StrEnum):
@@ -55,3 +57,8 @@ def carregar_referencia(caminho: Path = AQUI / "referencia.jsonl") -> list[Caso]
         except ValueError as erro:
             raise ValueError(f"{caminho.name}, linha {n}: {erro}") from erro
     return casos
+
+
+def carregar(nome: str):
+    """Um arquivo de dados da loja inventada."""
+    return json.loads((DADOS / f"{nome}.json").read_text(encoding="utf-8"))
