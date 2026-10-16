@@ -30,6 +30,25 @@ def test_todo_pedido_citado_existe():
     assert all(c.pedido in PEDIDOS for c in CASOS if c.pedido)
 
 
+def test_so_responde_sobre_pedido_quando_o_email_bate():
+    for c in CASOS:
+        if c.pedido and c.decisao in (Decisao.RESPONDER, Decisao.ABRIR_CHAMADO):
+            assert c.email == dono(c.pedido), f"{c.id}: o e-mail não é do dono do pedido"
+
+
+def test_existe_um_caso_de_pedido_de_outra_pessoa():
+    """É o caso que o capítulo 6 vai usar para quebrar o agente de propósito."""
+    assert any(c.pedido and c.email != dono(c.pedido) and c.decisao == Decisao.RECUSAR for c in CASOS)
+
+
+def test_chamado_so_para_pedido_entregue_ha_menos_de_90_dias():
+    for c in CASOS:
+        if c.decisao == Decisao.ABRIR_CHAMADO:
+            p = PEDIDOS[c.pedido]
+            assert p["status"] == "entregue", f"{c.id}: pedido não foi entregue"
+            assert (HOJE - date.fromisoformat(p["entregue_em"])).days <= 90, f"{c.id}: passou dos 90 dias"
+
+
 def test_linha_invalida_diz_qual_linha(tmp_path):
     arquivo = tmp_path / "ruim.jsonl"
     arquivo.write_text('{"id": "R01", "pergunta": "Oi, tudo bem?", "decisao": "talvez", "motivo": "não existe"}\n', encoding="utf-8")
