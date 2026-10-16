@@ -33,3 +33,12 @@ class Conversa(TypedDict, total=False):
     decisao: Decisao
     motivo: str
     resposta: str
+
+
+def montar(modelo: BaseChatModel):
+    """O grafo do agente: decidir, e depois um caminho para cada decisão do contrato."""
+    escolher = modelo.with_structured_output(Escolha)
+
+    def decidir(c: Conversa) -> Conversa:
+        e = escolher.invoke([("system", INSTRUCAO), ("human", c["pergunta"])])
+        return {"decisao": e.decisao, "motivo": e.motivo}
