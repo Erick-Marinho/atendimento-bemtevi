@@ -42,3 +42,32 @@ def montar(modelo: BaseChatModel):
     def decidir(c: Conversa) -> Conversa:
         e = escolher.invoke([("system", INSTRUCAO), ("human", c["pergunta"])])
         return {"decisao": e.decisao, "motivo": e.motivo}
+
+    def escrever(pedido: str):
+        def no(c: Conversa) -> Conversa:
+            m = modelo.invoke([("system", f"{INSTRUCAO}\n\n{pedido}"), ("human", c["pergunta"])])
+            return {"resposta": m.text}
+        return no
+
+    # onde o modelo não precisa escrever, ele não escreve: o texto é sempre o mesmo
+    def abrir_chamado(c: Conversa) -> Conversa:
+        return {"resposta": "Sinto muito pelo problema. Ainda não abro chamado sozinho: "
+                            "vou passar para uma pessoa da equipe abrir o seu."}
+
+    def passar(c: Conversa) -> Conversa:
+        return {"resposta": "Vou passar a sua mensagem para uma pessoa da equipe."}
+
+    caminhos = {
+        Decisao.RESPONDER: escrever("Responda ao cliente em poucas frases."),
+        Decisao.ABRIR_CHAMADO: abrir_chamado,
+        Decisao.RECUSAR: escrever("Diga ao cliente, com educação, que a loja não pode, e por quê."),
+        Decisao.PASSAR: passar,
+    }
+    grafo = StateGraph(Conversa)
+    grafo.add_node("decidir", decidir)
+    for decisao, no in caminhos.items():
+        grafo.add_node(decisao.value, no)
+        grafo.add_edge(decisao.value, END)
+    grafo.add_edge(START, "decidir")
+    grafo.add_conditional_edges("decidir", lambda c: c["decisao"].value, [d.value for d in caminhos])
+    return grafo.compile()
